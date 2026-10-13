@@ -129,6 +129,30 @@ describe('PhotoEditorPage', () => {
     expect(state.currentCrop()).toBe(crop);
   });
 
+  it('preserves the selected crop on canvas size notifications and initializes only on menu entry', async () => {
+    state.photoCrop.set({ width: 400, height: 200 });
+    state.footerMenu.set('crop');
+    await fixture.whenStable();
+    component.changeCrop('1');
+    vi.clearAllMocks();
+
+    state.photoCrop.set({ width: 400, height: 200 });
+    await fixture.whenStable();
+
+    expect(editor.startDrawingMode).not.toHaveBeenCalled();
+    expect(editor.setCropzoneRect).not.toHaveBeenCalled();
+    expect(state.currentCrop()).toBe('1');
+
+    state.footerMenu.set('menu');
+    await fixture.whenStable();
+    state.footerMenu.set('crop');
+    await fixture.whenStable();
+
+    expect(editor.startDrawingMode).toHaveBeenCalledExactlyOnceWith('CROPPER');
+    expect(editor.setCropzoneRect).toHaveBeenCalledExactlyOnceWith(2);
+    expect(state.currentCrop()).toBe('cover');
+  });
+
   it('applies the crop and resets crop state when closing the crop menu', async () => {
     state.footerMenu.set('crop');
     await fixture.whenStable();

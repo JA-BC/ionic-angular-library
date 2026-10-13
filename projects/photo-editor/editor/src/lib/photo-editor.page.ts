@@ -9,6 +9,7 @@ import {
   input,
   OnDestroy,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -70,16 +71,18 @@ export class PhotoEditorPage implements OnDestroy, ViewDidEnter, ViewDidLeave {
 
   private readonly footerMenuEffect = effect(() => {
     const menu = this.footerMenu();
-    const editor = this.editorInstance;
-    if (!editor) {
-      return;
-    }
-    if (menu === 'filter') {
-      void this.initializeFilterMenu();
-    } else if (menu === 'crop') {
-      editor.startDrawingMode('CROPPER');
-      this.changeCrop(this.requireSquare() ? '1' : 'cover');
-    }
+    untracked(() => {
+      const editor = this.editorInstance;
+      if (!editor) {
+        return;
+      }
+      if (menu === 'filter') {
+        void this.initializeFilterMenu();
+      } else if (menu === 'crop') {
+        editor.startDrawingMode('CROPPER');
+        this.changeCrop(this.requireSquare() ? '1' : 'cover');
+      }
+    });
   });
 
   private canvasContainer: HTMLElement | undefined;
