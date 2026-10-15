@@ -45,6 +45,14 @@ export const routes: Routes = [
 
 Use `kitRequiredUnauthorizedGuard`, `kitRequireConfirmingGuard`, and `kitRequireAuthorizedGuard` in route definitions. A protected asynchronous decision suspends previously published remote capability until the current authorization lease succeeds.
 
+## Share startup login requests
+
+`KitAuthLoginExchange<Identity, Result>` shares a pending backend login request. A preloaded result (including failure) can be consumed once by authorization while the originating navigation is current, for up to 30 seconds after completion. Later authorization calls make a fresh request; this is not a permissions cache.
+
+Keep one instance in the application authentication service. Capture the Firebase user when constructing the request, reject responses for a replaced user, and call `clear()` on sign-out. Provider eligibility, deletion recovery, terms acceptance, and response handling remain application-owned.
+
+For applications that initialize a local runtime before authorization, call `kitPreloadAuthLoginForNavigation(router, isCurrent => auth.preloadTokenLogin(isCurrent))` after Firebase readiness and required account recovery, before awaiting runtime initialization. Invoke its returned cleanup if initialization fails. It discards unconsumed work when that navigation ends or is canceled. Applications without useful startup work to overlap can use `run(identity, request)` alone.
+
 ## HTTP policy
 
 `provideKitHttp()` configures `kitAuthInterceptor` for credential injection, bypass rules, transient failure handling, and application error hooks. Register the interceptor separately with `provideHttpClient`. Only `getAuthHeaders` is required; every other hook is optional and application-owned.

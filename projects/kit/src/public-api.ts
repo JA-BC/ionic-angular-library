@@ -35,6 +35,7 @@ export * from './lib/keyboard/kit-keyboard';
 // Auth: functional route guards.
 export * from './lib/auth/auth-access.service';
 export * from './lib/auth/auth-guards';
+export * from './lib/auth/auth-login-exchange';
 
 // HTTP: functional interceptor.
 export * from './lib/http/kit-http.interceptor';
